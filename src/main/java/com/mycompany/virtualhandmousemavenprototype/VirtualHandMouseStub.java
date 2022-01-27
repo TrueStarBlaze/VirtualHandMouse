@@ -19,8 +19,12 @@ public class VirtualHandMouseStub {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws AWTException, FrameGrabber.Exception {
+        long start = System.currentTimeMillis();
+        while(System.currentTimeMillis() - start < 10000) {
         CanvasFrame canvas = new CanvasFrame("Web Cam");
         canvas.showImage(VideoAccessor.getFrame());
+        canvas.
+        }
 
 //        RobotCursor rc = new RobotCursor();
 //        int coords[] = {0, 0};
