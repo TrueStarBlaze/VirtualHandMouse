@@ -8,6 +8,7 @@ package com.mycompany.virtualhandmousemavenprototype;
 import java.awt.AWTException;
 import java.util.Iterator;
 import org.bytedeco.javacv.CanvasFrame;
+import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 /**
  *
@@ -18,12 +19,17 @@ public class VirtualHandMouseStub {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws AWTException, FrameGrabber.Exception {
-        long start = System.currentTimeMillis();
+    public static void main(String[] args) throws AWTException, FrameGrabber.Exception, InterruptedException {
+//                CanvasFrame canvas = new CanvasFrame("Web Cam");
+                int frames = 0;
+                VideoAccessor.init();
+                long start = System.currentTimeMillis();
         while(System.currentTimeMillis() - start < 10000) {
-        CanvasFrame canvas = new CanvasFrame("Web Cam");
-        canvas.showImage(VideoAccessor.getFrame());
+        Frame f = VideoAccessor.getFrame();
+        System.out.println(++frames);
         }
+        System.out.println("FPS: " + frames/ 10.0);
+        System.exit(0);
 
 //        RobotCursor rc = new RobotCursor();
 //        int coords[] = {0, 0};

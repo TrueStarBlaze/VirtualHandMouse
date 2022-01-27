@@ -11,16 +11,22 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameGrabber;
 import org.bytedeco.opencv.opencv_core.IplImage;
 import org.bytedeco.javacv.CanvasFrame;
+import org.bytedeco.javacv.VideoInputFrameGrabber;
 /**
  *
  * @author erick
  */
 public class VideoAccessor {
-
-    public static Frame getFrame() throws FrameGrabber.Exception {
-        FrameGrabber fg = new OpenCVFrameGrabber(0);
+    private static boolean started = false;
+    private static FrameGrabber fg = new VideoInputFrameGrabber(0);
+    
+    public static void init() throws FrameGrabber.Exception {
         fg.start();
-        return fg.grab();
+    }
+    
+    public static Frame getFrame() throws FrameGrabber.Exception, InterruptedException {
+        Frame f = fg.grabFrame();
+        return f;
     }
 
     public static IplImage toImage(Frame f) {
