@@ -23,7 +23,6 @@ public class VirtualHandMouseStub {
         while(System.currentTimeMillis() - start < 10000) {
         CanvasFrame canvas = new CanvasFrame("Web Cam");
         canvas.showImage(VideoAccessor.getFrame());
-        canvas.
         }
 
 //        RobotCursor rc = new RobotCursor();
