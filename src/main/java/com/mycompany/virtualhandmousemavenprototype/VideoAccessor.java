@@ -20,11 +20,13 @@ public class VideoAccessor {
     private static boolean started = false;
     private static FrameGrabber fg = new VideoInputFrameGrabber(0);
     
+    
     public static void init() throws FrameGrabber.Exception {
         fg.start();
     }
     
     public static Frame getFrame() throws FrameGrabber.Exception, InterruptedException {
+//        try {
         Frame f = fg.grabFrame();
         return f;
     }
