@@ -34,4 +34,9 @@ public class NLinkedList<T> extends LinkedList<T>{
             }
             return ret;
         }
+        public int[][] lastAmtChecked (int amt, int max) {
+         this.memCheck(max);
+         return this.lastAmt(amt);
+         
+        }
 }

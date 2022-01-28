@@ -5,12 +5,15 @@
  */
 package com.mycompany.virtualhandmousemavenprototype;
 
+import org.bytedeco.opencv.opencv_core.IplImage;
+
 /**
  *
  * @author erick
  */
 public class HandLocationDeterminer {
-    public static int[] analyze() {
+    public static int[] analyze(IplImage image) {
+        
         return null;
     }
 }
