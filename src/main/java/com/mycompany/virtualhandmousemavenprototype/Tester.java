@@ -16,59 +16,100 @@ import org.bytedeco.javacv.FrameGrabber;
  *
  * @author erick
  */
-public class VirtualHandMouseStub {
+public class Tester {
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws AWTException, FrameGrabber.Exception, InterruptedException {
-        String startQ = "Test which part: Webcam (1), Robot Cursor (2), ModifiedLinkedList (3), or exit (end)";
+                            RobotCursor rc = new RobotCursor();
+//                            int[] test = {0, 0};
+//                            rc.glide(test, 10000, 5000);
+        String startQ = "Test which part: Webcam (1), Robot Cursor (2), ModifiedLinkedList (3), or exit (exit)";
         System.out.println(startQ);
         Scanner sc = new Scanner(System.in);
         String inputString = sc.nextLine();
         boolean initialized = false;
         int input = (int) Double.parseDouble(inputString);
         Frame f;
-        CanvasFrame canvas = new CanvasFrame("Default Cam");
-        RobotCursor rc = new RobotCursor();
-        while (!inputString.toLowerCase().contains("end")) {
+        NLinkedList<int[]> nll = new NLinkedList();;
+        while (!inputString.toLowerCase().contains("exit")) {
             switch (Integer.parseInt(inputString)) {
                 case 1:
+                    System.out.println("Getting frame from default device camera...");
+                    CanvasFrame canvas = new CanvasFrame("Default Cam");
                     if (!initialized) {
                         VideoAccessor.init();
                         initialized = true;
                     }
-                    System.out.println("Getting frame from default device camera...");
                     f = VideoAccessor.getFrame();
                     canvas.showImage(f);
                     System.out.println(startQ);
                     inputString = sc.nextLine();
+                    canvas.dispose();
                     break;
                 case 2:
-                    System.out.println("Enter coords to send mouse (x, y)");
-                    int x = sc.nextInt();
-                    int y = sc.nextInt();
+                    System.out.println("Enter x coord to send mouse");
+                    inputString = sc.nextLine();
+                    int x = Integer.parseInt(inputString);
+                    System.out.println("Enter y coord to send mouse");
+                    inputString = sc.nextLine();
+                    int y = Integer.parseInt(inputString);
                     System.out.println("Enter duration of mouse movement in milliseconds");
-                    int t = sc.nextInt();
-                    System.out.println("Enter amount of steps (higher amount of steps means smoother movement: try 5000");
-                    int steps = sc.nextInt();
+                    inputString = sc.nextLine();
+                    int t = 0;
+                    t = Integer.parseInt(inputString);
+                    System.out.println("Enter amount of steps (higher amount of steps means smoother movement: try 5000)");
+                    inputString = sc.nextLine();
+                    int steps = Integer.parseInt(inputString);
                     System.out.println("Moving mouse...");
                     int[] coords = {x, y};
                     rc.glide(coords, t, steps);
+
+//                    rc.glide(coords, 10000, 5000);
                     System.out.println("Enter type of click: left click (1), right click (2)");
-                    int click = sc.nextInt();
+                    inputString = sc.nextLine();
+                    int click = Integer.parseInt(inputString);
                     rc.click(click);
                     System.out.println(startQ);
                     inputString = sc.nextLine();
                     break;
+
                 case 3:
-                    while (!inputString.contains("exit")) {
+                    while (!inputString.contains("end")) {
                         //TODO
+                        System.out.println("Push coords (push), pop coords (pop), or end (end)");
+                        inputString = sc.nextLine();
+                        switch (inputString.toLowerCase()) {
+                            case "push":
+                                System.out.println("Enter x coord to push");
+                                inputString = sc.nextLine();
+                                int xLL = Integer.parseInt(inputString);
+                                System.out.println("Enter y coord to push");
+                                inputString = sc.nextLine();
+                                int yLL = Integer.parseInt(inputString);
+                                int[] coordsNll = {xLL, yLL};
+                                nll.push(coordsNll);
+                                System.out.println("Coords pushed");
+                                break;
+                            case "pop":
+                                System.out.println("Popping coords...");
+                                if (nll.isEmpty()) {
+                                    System.out.println("Empty...");
+                                } else {
+                                    int[] popped = nll.pop();
+                                    System.out.println("Popped Coords: (" + popped[0] + ", " + popped[1] + ")");
+                                }
+                                break;
+                        }
                     }
+                    nll.clear();
+                    System.out.println(startQ);
+                    inputString = sc.nextLine();
                     break;
             }
-            System.exit(0);
         }
+        System.exit(0);
 //                CanvasFrame canvas = new CanvasFrame("Web Cam");
 //                int frames = 0;
 //                VideoAccessor.init();
