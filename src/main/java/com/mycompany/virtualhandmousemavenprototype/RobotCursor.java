@@ -71,7 +71,7 @@ InputEvent.BUTTON3_MASK
         if (i == 1) {
             this.r.mousePress(InputEvent.BUTTON1_DOWN_MASK);
             this.r.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-        } else if (i == 3) {
+        } else if (i == 2) {
             this.r.mousePress(InputEvent.BUTTON3_DOWN_MASK);
             this.r.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
         } else {

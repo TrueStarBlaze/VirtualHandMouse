@@ -7,9 +7,11 @@ package com.mycompany.virtualhandmousemavenprototype;
 
 import java.awt.AWTException;
 import java.util.Iterator;
+import java.util.Scanner;
 import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
+
 /**
  *
  * @author erick
@@ -20,16 +22,63 @@ public class VirtualHandMouseStub {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws AWTException, FrameGrabber.Exception, InterruptedException {
-//                CanvasFrame canvas = new CanvasFrame("Web Cam");
-                int frames = 0;
-                VideoAccessor.init();
-                long start = System.currentTimeMillis();
-        while(System.currentTimeMillis() - start < 10000) {
-        Frame f = VideoAccessor.getFrame();
-        System.out.println(++frames);
+        String startQ = "Test which part: Webcam (1), Robot Cursor (2), ModifiedLinkedList (3), or exit (end)";
+        System.out.println(startQ);
+        Scanner sc = new Scanner(System.in);
+        String inputString = sc.nextLine();
+        boolean initialized = false;
+        int input = (int) Double.parseDouble(inputString);
+        Frame f;
+        CanvasFrame canvas = new CanvasFrame("Default Cam");
+        RobotCursor rc = new RobotCursor();
+        while (!inputString.toLowerCase().contains("end")) {
+            switch (Integer.parseInt(inputString)) {
+                case 1:
+                    if (!initialized) {
+                        VideoAccessor.init();
+                        initialized = true;
+                    }
+                    System.out.println("Getting frame from default device camera...");
+                    f = VideoAccessor.getFrame();
+                    canvas.showImage(f);
+                    System.out.println(startQ);
+                    inputString = sc.nextLine();
+                    break;
+                case 2:
+                    System.out.println("Enter coords to send mouse (x, y)");
+                    int x = sc.nextInt();
+                    int y = sc.nextInt();
+                    System.out.println("Enter duration of mouse movement in milliseconds");
+                    int t = sc.nextInt();
+                    System.out.println("Enter amount of steps (higher amount of steps means smoother movement: try 5000");
+                    int steps = sc.nextInt();
+                    System.out.println("Moving mouse...");
+                    int[] coords = {x, y};
+                    rc.glide(coords, t, steps);
+                    System.out.println("Enter type of click: left click (1), right click (2)");
+                    int click = sc.nextInt();
+                    rc.click(click);
+                    System.out.println(startQ);
+                    inputString = sc.nextLine();
+                    break;
+                case 3:
+                    while (!inputString.contains("exit")) {
+                        //TODO
+                    }
+                    break;
+            }
+            System.exit(0);
         }
-        System.out.println("FPS: " + frames/ 10.0);
-        System.exit(0);
+//                CanvasFrame canvas = new CanvasFrame("Web Cam");
+//                int frames = 0;
+//                VideoAccessor.init();
+//                long start = System.currentTimeMillis();
+//        while(System.currentTimeMillis() - start < 10000) {
+//        Frame f = VideoAccessor.getFrame();
+//        System.out.println(++frames);
+//        }
+//        System.out.println("FPS: " + frames/ 10.0);
+//        System.exit(0);
 
 //        RobotCursor rc = new RobotCursor();
 //        int coords[] = {0, 0};
