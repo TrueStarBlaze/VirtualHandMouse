@@ -21,14 +21,15 @@ import org.bytedeco.opencv.opencv_videoio.VideoCapture;
 public class VideoAccessor {
     private  int cam = 0;
     private  FrameGrabber fg;
-    private VideoCapture camera;
+    private VideoCapture vidCap;
     
     public VideoAccessor (int camType) {
         this.cam = camType;
     }
 
     public  void init() throws FrameGrabber.Exception {
-                this.camera = new VideoCapture(cam);   
+                this.vidCap = new VideoCapture(cam); 
+                if (!vidCap.isOpened())System.out.println("No Webcam");
                 fg = new VideoInputFrameGrabber(cam);
                 fg.start();
     }

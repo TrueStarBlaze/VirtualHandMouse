@@ -22,17 +22,8 @@ public class Tester {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws AWTException, FrameGrabber.Exception, InterruptedException {
-        VideoAccessor va = new VideoAccessor();
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        VideoAccessor va = new VideoAccessor(0);
+        va.init();
     }
 
 }
