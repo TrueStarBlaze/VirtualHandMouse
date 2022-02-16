@@ -5,12 +5,15 @@
 package com.mycompany.virtualhandmouseprototype;
 
 //import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.global.opencv_core;
 import org.opencv.core.Mat;
 import org.bytedeco.opencv.opencv_core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.Core;
 //import org.bytedeco.opencv.opencv_core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.core.CvType;
 
 /**
  *
@@ -28,7 +31,21 @@ public class HandSegmentation {
     private Rect skinColorSamplerRectangle1, skinColorSamplerRectangle2;
 
     private void calculateThresholds(Mat sample1, Mat sample2) {
+        int offsetLowThreshold = 80;
+	int offsetHighThreshold = 30;
+        
+        Scalar hsvMeansSample1 = Core.mean(sample1);
+        Scalar hsvMeansSample2 = Core.mean(sample2);
+        this.hLowThreshold = (int) (Math.min(hsvMeansSample1.val[0], hsvMeansSample2.val[0]) - offsetLowThreshold);
+	this.hHighThreshold = (int) (Math.max(hsvMeansSample1.val[0], hsvMeansSample2.val[0]) + offsetHighThreshold);
 
+	this.sLowThreshold = (int) (Math.min(hsvMeansSample1.val[1], hsvMeansSample2.val[1]) - offsetLowThreshold);
+	this.sHighThreshold = (int) (Math.max(hsvMeansSample1.val[1], hsvMeansSample2.val[1]) + offsetHighThreshold);
+        
+        
+        //redundant but secure to make future scalars consistent with hsv
+        this.vLowThreshold = (int) (Math.min(hsvMeansSample1.val[2], hsvMeansSample2.val[2]) - offsetLowThreshold);
+	this.vHighThreshold = (int) (Math.max(hsvMeansSample1.val[2], hsvMeansSample2.val[2]) + offsetHighThreshold);
     }
 
     private void performOpening(Mat binaryImage, int structuralElementShapde, Point structuralElementSize) {
@@ -36,29 +53,53 @@ public class HandSegmentation {
     }
 
     public void drawSkinColorSampler(Mat input) {
-        int frameWidth  = (int) input.size().width;
+        int frameWidth = (int) input.size().width;
         int frameHeight = (int) input.size().height;
-        
-        int rectSize = 20;
+
+        int rectSize = 20; //rectangle of roughly this size to cover face
         Scalar rectangleColour = new Scalar(255, 0, 255);
-        
-        this.skinColorSamplerRectangle1 = new Rect(frameWidth / 5, frameHeight / 2, rectSize, rectSize);
+
+        this.skinColorSamplerRectangle1 = new Rect(frameWidth / 5, frameHeight / 2, rectSize, rectSize); //Sampling two potential regions
         this.skinColorSamplerRectangle2 = new Rect(frameWidth / 5, frameHeight / 3, rectSize, rectSize);
-        
+
+        //covering up the face face
         Imgproc.rectangle(input,
-		skinColorSamplerRectangle1,
-		rectangleColour);
-        
-        Imgproc.rectangle(input, skinColorSamplerRectangle2, rectangleColour);
-        
+                this.skinColorSamplerRectangle1,
+                rectangleColour);
+
+        Imgproc.rectangle(input,
+                this.skinColorSamplerRectangle2,
+                rectangleColour);
 
     }
 
     public void calibrate(Mat input) {
+        //converting to HSV to increase resistance against shadows and influence
+        Mat hsvInput = null;
+        Imgproc.cvtColor(input, hsvInput, Imgproc.COLOR_BGR2HSV);
+        Mat sample1 = new Mat(hsvInput, skinColorSamplerRectangle1);
+        Mat sample2 = new Mat(hsvInput, skinColorSamplerRectangle2);
+        this.calculateThresholds(sample1, sample2);
 
+	this.calibrated = true;
     }
 
+    
+    
+    
     public Mat getSkinMask(Mat input) {
-
+        Mat skinMask = null;
+        if (!this.calibrated) {
+            skinMask = Mat.zeros(input.size(), CvType.CV_8UC1);
+            return skinMask;
+        }
+        Mat hsvInput = null;
+        Imgproc.cvtColor(input, hsvInput, Imgproc.COLOR_BGR2HSV);
+        
+        Core.inRange(hsvInput, 
+                new Scalar(this.hLowThreshold, this.sLowThreshold, this.vLowThreshold), 
+                new Scalar(this.hHighThreshold, this.sHighThreshold, this.vHighThreshold), 
+                skinMask);
+        return skinMask;
     }
 }
