@@ -19,7 +19,7 @@ import org.opencv.core.CvType;
  *
  * @author 1100015542
  */
-public class HandSegmentation {
+public class SkinDetector {
 
     private int hLowThreshold = 0;
     private int hHighThreshold = 0;
