@@ -14,6 +14,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.CvType;
+import org.opencv.core.Size;
 
 /**
  *
@@ -48,8 +49,12 @@ public class SkinDetector {
 	this.vHighThreshold = (int) (Math.max(hsvMeansSample1.val[2], hsvMeansSample2.val[2]) + offsetHighThreshold);
     }
 
-    private void performOpening(Mat binaryImage, int structuralElementShapde, Point structuralElementSize) {
-
+    private void performOpening(Mat binaryImage, int structuralElementShape, Point structuralElementSize) {
+        Size ksize = null;
+        Mat structuringElement = Imgproc.getStructuringElement(hLowThreshold, ksize);
+        
+            
+        //binary img is src and dst
     }
 
     public void drawSkinColorSampler(Mat input) {
