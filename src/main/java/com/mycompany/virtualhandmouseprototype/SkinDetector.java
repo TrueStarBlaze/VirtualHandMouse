@@ -5,9 +5,10 @@
 package com.mycompany.virtualhandmouseprototype;
 
 //import org.bytedeco.opencv.opencv_core.Mat;
-import org.bytedeco.opencv.global.opencv_core;
+//import org.bytedeco.opencv.global.opencv_core;
 import org.opencv.core.Mat;
-import org.bytedeco.opencv.opencv_core.Point;
+//import org.bytedeco.opencv.opencv_core.Point;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Core;
 //import org.bytedeco.opencv.opencv_core.Rect;
@@ -50,9 +51,8 @@ public class SkinDetector {
     }
 
     private void performOpening(Mat binaryImage, int structuralElementShape, Point structuralElementSize) {
-        Size ksize = null;
-        Mat structuringElement = Imgproc.getStructuringElement(hLowThreshold, ksize);
-        
+        Mat structuringElement = Imgproc.getStructuringElement(structuralElementShape, new Size(structuralElementSize));
+        Imgproc.morphologyEx(binaryImage, binaryImage, Imgproc.MORPH_OPEN, structuringElement);
             
         //binary img is src and dst
     }
