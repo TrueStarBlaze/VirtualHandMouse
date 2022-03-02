@@ -9,10 +9,6 @@ package com.mycompany.virtualhandmouseprototype;
  * @author 1100015542
  */
 public class FaceDetector {
-    
-    
-    
-    
     public FaceDetector () {
         
     }
