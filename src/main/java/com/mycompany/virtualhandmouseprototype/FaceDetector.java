@@ -7,7 +7,9 @@ package com.mycompany.virtualhandmouseprototype;
 import org.bytedeco.opencv.opencv_core.CvMemStorage;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 
 /**
  *
@@ -24,6 +26,8 @@ public class FaceDetector {
     private String faceClassifierFileName = "haarcascade_frontalface_alt.xml";
     private CascadeClassifier faceCC;
     public FaceDetector () {
+        this.faceCC.load(this.faceClassifierFileName);
+        CvMemStorage storage = CvMemStorage.create();
     }
     
     
@@ -33,17 +37,18 @@ public class FaceDetector {
         
         Imgproc.cvtColor(input, frameGrey, Imgproc.COLOR_BGR2GRAY); //grey scaled
         Imgproc.equalizeHist(frameGrey, frameGrey); //improving distinction and contrast
-        
-        this.faceCC.load(this.faceClassifierFileName);
-        CvMemStorage storage = CvMemStorage.create();
                 
             this.faceCC.detectMultiScale(frameGrey, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE/*CV_HAAR_SCALE_IMAGE*/ , new Size(120, 120));
             //next step is to cover rect
             Rect[] rects = faces.toArray();
             for (int i = 0; i < faces.toArray().length; ++i) {
-//                Imgproc.rectangle(output, new Point(rects[i].x, rects[i].y), pt2, color, i);
+                Imgproc.rectangle(output, new Point(rects[i].x, rects[i].y), new Point(rects[i].x + rects[i].width, rects[i].y + rects[i].height), new Scalar(0, 0, 0), -1);
             }
+    }
+    
+    public Rect getFaceRects(Mat input) {
+        MatOfRect faces2 = null;
         
-       
+        Imgproc.cvtColor
     }
 }
