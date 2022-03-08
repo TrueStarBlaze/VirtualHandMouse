@@ -48,7 +48,16 @@ public class FaceDetector {
     
     public Rect getFaceRects(Mat input) {
         MatOfRect faces2 = null;
+        Mat inputGrey = null;
         
-        Imgproc.cvtColor
+        Imgproc.cvtColor(input, inputGrey, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.equalizeHist(inputGrey, inputGrey);
+        
+        this.faceCC.detectMultiScale(inputGrey, faces2, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE, new Size(120, 120));
+        Rect[] facesRect = faces2.toArray();
+        if (facesRect.length> 0)
+		return facesRect[0];
+	else
+		return new Rect(0, 0, 1, 1);
     }
 }
