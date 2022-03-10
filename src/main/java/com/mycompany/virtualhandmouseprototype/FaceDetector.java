@@ -46,7 +46,7 @@ public class FaceDetector {
             }
     }
     
-    public Rect getFaceRects(Mat input) {
+    public Rect getFaceRect(Mat input) {
         MatOfRect faces2 = null;
         Mat inputGrey = null;
         
