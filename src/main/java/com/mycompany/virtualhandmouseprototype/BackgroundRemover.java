@@ -27,7 +27,8 @@ public class BackgroundRemover {
     }
     
     public Mat getForeground(Mat input) {
-        Mat foregroundMask = 
+//        Mat foregroundMask =
+return null;
     }
     
     private Mat getForeGroundMask(Mat input) {
@@ -46,10 +47,10 @@ public class BackgroundRemover {
 
     private void removeBackground(Mat input, Mat background) {
         int offset = 10;
-        
+        byte[] buffer = new byte[(int) input.total() * input.channels()];
         for (int i = 0; i < input.rows(); ++i)  {
             for (int j = 0; j < input.cols(); ++j) {
-                char inputPixel = input.at(<Character>, i, j);
+                int pixel = input.get(i, j, buffer);
             }
         }
     }
