@@ -7,7 +7,7 @@ package com.mycompany.virtualhandmouseprototype;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.CvType;
-import java.lang.Character;
+import org.opencv
 
 /**
  *
@@ -46,11 +46,9 @@ return null;
     }
 
     private void removeBackground(Mat input, Mat background) {
-        int offset = 10;
-        byte[] buffer = new byte[(int) input.total() * input.channels()];
         for (int i = 0; i < input.rows(); ++i)  {
             for (int j = 0; j < input.cols(); ++j) {
-                int pixel = input.get(i, j, buffer);
+                input.get(i, j, input.)
             }
         }
     }

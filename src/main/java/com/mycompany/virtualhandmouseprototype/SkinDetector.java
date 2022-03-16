@@ -4,17 +4,19 @@
  */
 package com.mycompany.virtualhandmouseprototype;
 
-//import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_core.Mat;
 //import org.bytedeco.opencv.global.opencv_core;
-import org.opencv.core.Mat;
-//import org.bytedeco.opencv.opencv_core.Point;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Core;
-//import org.bytedeco.opencv.opencv_core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
+//import org.opencv.core.Mat;
+import org.bytedeco.opencv.opencv_core.Point;
+//import org.opencv.core.Point;
+//import org.opencv.core.Rect;
+import org.bytedeco.opencv.opencv_core.Rect;
+//import org.opencv.core.Scalar;
+import org.bytedeco.opencv.opencv_core.Scalar;
+//import org.opencv.imgproc.Imgproc;
+//TODO
 import org.opencv.core.CvType;
+import org.bytedeco.opencv.opencv_core.CvScalar;
 import org.opencv.core.Size;
 
 /**
