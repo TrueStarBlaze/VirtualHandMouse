@@ -19,7 +19,7 @@ import org.bytedeco.opencv.opencv_core.Scalar;
 //import org.opencv.imgproc.Imgproc;
 //TODO
 //import org.opencv.core.CvType;
-import org.bytedeco.opencv.opencv_core.CvScalar;
+//import org.bytedeco.opencv.opencv_core.CvScalar;
 //import org.opencv.core.Size;
 import org.bytedeco.opencv.opencv_core.Size;
 import org.bytedeco.javacpp.indexer.DoubleIndexer;
@@ -41,11 +41,13 @@ public class SkinDetector {
     private void calculateThresholds(Mat sample1, Mat sample2) {
         int offsetLowThreshold = 80;
 	int offsetHighThreshold = 30;
+//        Scalar hsvMeansSample1 = opencv_core.mean(sample1);
         Scalar hsvMeansSample1 = opencv_core.mean(sample1);
         Mat hsvMeansMat1 = new Mat(hsvMeansSample1);
         DoubleIndexer dI1 = hsvMeansMat1.createIndexer();
 
-        Scalar hsvMeansSample2 = opencv_core.mean(sample2);
+//        Scalar hsvMeansSample2 = opencv_core.mean(sample2);
+Scalar hsvMeansSample2 = opencv_core.mean(sample2);
         Mat hsvMeansMat2 = new Mat(hsvMeansSample2);
         DoubleIndexer dI2 = hsvMeansMat2.createIndexer();
         
@@ -74,7 +76,8 @@ public class SkinDetector {
         int frameHeight = (int) input.size().height();
 
         int rectSize = 20; //rectangle of roughly this size to cover face
-        Scalar rectangleColour = new Scalar(255, 0, 255);
+//        Scalar rectangleColour = new Scalar(255, 0, 255);
+        Scalar rectangleColour = new Scalar(255, 0, 255, 0);
 
         this.skinColorSamplerRectangle1 = new Rect(frameWidth / 5, frameHeight / 2, rectSize, rectSize); //Sampling two potential regions
         this.skinColorSamplerRectangle2 = new Rect(frameWidth / 5, frameHeight / 3, rectSize, rectSize);
@@ -107,7 +110,8 @@ public class SkinDetector {
     public Mat getSkinMask(Mat input) {
         Mat skinMask = null;
         if (!this.calibrated) {
-            skinMask = Mat.zeros(input.size(), CvType.CV_8UC1);
+            skinMask = Mat.zeros(input.size(), opencv_core.CV_8UC1);
+            
             return skinMask;
         }
         Mat hsvInput = null;
