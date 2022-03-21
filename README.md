@@ -1,2 +1,3 @@
 # VirtualHandMouse
-IDK why it never lets me push to the right branch callum plz help
+Major hand recognition software taken from PierfrancescoSoffritti @ https://github.com/PierfrancescoSoffritti
+
