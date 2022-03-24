@@ -64,7 +64,7 @@ public class FingerCount {
         opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullIndxs, true, false);
         
         Mat defects = null;
-        if (3 < hullIndxs.){
+        if (3 < hullIndxs.elemSize()){//TODO
             opencv_imgproc.convexityDefects(contoursMatArr[biggestContourIdx], hullIndxs, defects);
         }else return contoursMat;
         
@@ -72,7 +72,7 @@ public class FingerCount {
         Point centerOfRect = new Point(boundingRect.tl().x() + boundingRect.br().x() / 2, boundingRect.tl().y() + boundingRect.br().y() / 2);
         
         Mat startPoints, farPoints;
-        for (int i = 0; i < defects; ++i) {
+        for (int i = 0; i < defects; ++i) {//TODO
             
         }
         
