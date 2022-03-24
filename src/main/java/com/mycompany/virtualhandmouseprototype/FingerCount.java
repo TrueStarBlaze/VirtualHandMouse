@@ -13,6 +13,8 @@ import org.bytedeco.opencv.opencv_core.Scalar;
 import org.bytedeco.opencv.global.opencv_imgproc;
 //import org.bytedeco.opencv.presets.opencv_imgproc
 import org.bytedeco.opencv.opencv_core.MatVector;
+import org.bytedeco.opencv.opencv_core.Point;
+import org.bytedeco.opencv.opencv_core.Rect;
 //import org.bytedeco.opencv.opencv_core.MatVectorVector;
 
 /**
@@ -61,7 +63,18 @@ public class FingerCount {
         opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullPoints, true, true);
         opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullIndxs, true, false);
         
+        Mat defects = null;
+        if (3 < hullIndxs.){
+            opencv_imgproc.convexityDefects(contoursMatArr[biggestContourIdx], hullIndxs, defects);
+        }else return contoursMat;
         
+        Rect boundingRect = opencv_imgproc.boundingRect(hullPoints);
+        Point centerOfRect = new Point(boundingRect.tl().x() + boundingRect.br().x() / 2, boundingRect.tl().y() + boundingRect.br().y() / 2);
+        
+        Mat startPoints, farPoints;
+        for (int i = 0; i < defects; ++i) {
+            
+        }
         
         
     }
