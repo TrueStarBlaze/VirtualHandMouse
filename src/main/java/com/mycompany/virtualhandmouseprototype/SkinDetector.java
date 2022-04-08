@@ -4,10 +4,10 @@
  */
 package com.mycompany.virtualhandmouseprototype;
 
-import java.nio.ByteBuffer;
+//import java.nio.ByteBuffer;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.global.opencv_core;
-import org.bytedeco.javacpp.presets.javacpp;
+//import org.bytedeco.javacpp.presets.javacpp;
 //import org.opencv.core.Mat;
 import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.global.opencv_imgproc;
@@ -23,6 +23,7 @@ import org.bytedeco.opencv.opencv_core.Scalar;
 //import org.opencv.core.Size;
 import org.bytedeco.opencv.opencv_core.Size;
 import org.bytedeco.javacpp.indexer.DoubleIndexer;
+
 /**
  *
  * @author 1100015542
@@ -40,34 +41,34 @@ public class SkinDetector {
 
     private void calculateThresholds(Mat sample1, Mat sample2) {
         int offsetLowThreshold = 80;
-	int offsetHighThreshold = 30;
+        int offsetHighThreshold = 30;
 //        Scalar hsvMeansSample1 = opencv_core.mean(sample1);
         Scalar hsvMeansSample1 = opencv_core.mean(sample1);
         Mat hsvMeansMat1 = new Mat(hsvMeansSample1);
         DoubleIndexer dI1 = hsvMeansMat1.createIndexer();
 
 //        Scalar hsvMeansSample2 = opencv_core.mean(sample2);
-Scalar hsvMeansSample2 = opencv_core.mean(sample2);
+        Scalar hsvMeansSample2 = opencv_core.mean(sample2);
         Mat hsvMeansMat2 = new Mat(hsvMeansSample2);
         DoubleIndexer dI2 = hsvMeansMat2.createIndexer();
-        
+
         //h channel
         this.hLowThreshold = (int) (Math.min(dI1.get(0), dI1.get(0)) - offsetLowThreshold);
-	this.hHighThreshold = (int) (Math.max(dI2.get(0), dI2.get(0)) + offsetHighThreshold);
+        this.hHighThreshold = (int) (Math.max(dI2.get(0), dI2.get(0)) + offsetHighThreshold);
         //s channel
         this.hLowThreshold = (int) (Math.min(dI1.get(1), dI1.get(1)) - offsetLowThreshold);
-	this.hHighThreshold = (int) (Math.max(dI2.get(1), dI2.get(1)) + offsetHighThreshold);
-        
+        this.hHighThreshold = (int) (Math.max(dI2.get(1), dI2.get(1)) + offsetHighThreshold);
+
         //v channel
         //redundant but secure to make future scalars consistent with hsv
         this.hLowThreshold = (int) (Math.min(dI1.get(2), dI1.get(2)) - offsetLowThreshold);
-	this.hHighThreshold = (int) (Math.max(dI2.get(2), dI2.get(2)) + offsetHighThreshold);
+        this.hHighThreshold = (int) (Math.max(dI2.get(2), dI2.get(2)) + offsetHighThreshold);
     }
 
     private void performOpening(Mat binaryImage, int structuralElementShape, Point structuralElementSize) {
         Mat structuringElement = opencv_imgproc.getStructuringElement(structuralElementShape, new Size(structuralElementSize));
         opencv_imgproc.morphologyEx(binaryImage, binaryImage, opencv_imgproc.MORPH_OPEN, structuringElement);
-            
+
         //binary img is src and dst
     }
 
@@ -101,25 +102,23 @@ Scalar hsvMeansSample2 = opencv_core.mean(sample2);
         Mat sample2 = new Mat(hsvInput, skinColorSamplerRectangle2);
         this.calculateThresholds(sample1, sample2);
 
-	this.calibrated = true;
+        this.calibrated = true;
     }
 
-    
-    
-    
     public Mat getSkinMask(Mat input) {
         Mat skinMask = null;
         if (!this.calibrated) {
-            skinMask = Mat.zeros(input.size(), opencv_core.CV_8UC1);
-            
+            skinMask = Mat.zeros(input.size(), opencv_core.CV_8UC1).asMat();
+
             return skinMask;
         }
         Mat hsvInput = null;
         opencv_imgproc.cvtColor(input, hsvInput, opencv_imgproc.COLOR_BGR2HSV);
-        
-        opencv_core.inRange(hsvInput, 
-                new Scalar(this.hLowThreshold, this.sLowThreshold, this.vLowThreshold), 
-                new Scalar(this.hHighThreshold, this.sHighThreshold, this.vHighThreshold), 
+
+        opencv_core.inRange(
+                hsvInput,
+                new Mat(new Scalar(this.hLowThreshold, this.sLowThreshold, this.vLowThreshold, 0)),
+                new Mat(new Scalar(this.hHighThreshold, this.sHighThreshold, this.vHighThreshold, 0)),
                 skinMask);
         return skinMask;
     }
