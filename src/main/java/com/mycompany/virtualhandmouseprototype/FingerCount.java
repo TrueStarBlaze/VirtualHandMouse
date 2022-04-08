@@ -71,9 +71,10 @@ public class FingerCount {
         Rect boundingRect = opencv_imgproc.boundingRect(hullPoints);
         Point centerOfRect = new Point(boundingRect.tl().x() + boundingRect.br().x() / 2, boundingRect.tl().y() + boundingRect.br().y() / 2);
         
-        Mat startPoints, farPoints; 
-        for (int i = 0; i < defects.rows(); ++i) {//TODO
-            
+        Mat startPoints = null, farPoints;
+        MatVector temp = new MatVector(defects);
+        for (int i = 0; i < temp.size(); ++i) {//TODO
+            startPoints.push_back(contoursMatArr[biggestContourIdx]);   
         }
         
         
