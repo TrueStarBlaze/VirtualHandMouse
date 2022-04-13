@@ -22,6 +22,7 @@ import org.bytedeco.opencv.opencv_core.Rect;
  * @author erick
  */
 public class FingerCount {
+
     //                                      B   G   R   A
     private final Scalar blue = new Scalar(255, 0, 0, 0);
     private final Scalar green = new Scalar(0, 255, 0, 0);
@@ -30,6 +31,8 @@ public class FingerCount {
     private final Scalar white = new Scalar(255, 255, 255, 0);
     private final Scalar yellow = new Scalar(0, 255, 255, 0);
     private final Scalar purple = new Scalar(255, 0, 255, 0);
+
+    private final double BOUNDING_RECT_FINGER_SIZE_SCALING = 0.3;
 
     public Mat findFingersCount(Mat input, Mat frame) {
         Mat contoursMat = Mat.zeros(input.size(), opencv_core.CV_8UC3).asMat();
@@ -62,22 +65,33 @@ public class FingerCount {
         Mat hullPoints = null, hullIndxs = null;
         opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullPoints, true, true);
         opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullIndxs, true, false);
-        
+
         Mat defects = null;
-        if (3 < hullIndxs.rows()){//TODO
+        if (3 < hullIndxs.rows()) {//TODO
             opencv_imgproc.convexityDefects(contoursMatArr[biggestContourIdx], hullIndxs, defects);
-        }else return contoursMat;
-        
+        } else {
+            return contoursMat;
+        }
+
         Rect boundingRect = opencv_imgproc.boundingRect(hullPoints);
         Point centerOfRect = new Point(boundingRect.tl().x() + boundingRect.br().x() / 2, boundingRect.tl().y() + boundingRect.br().y() / 2);
-        
+
         Mat startPoints = null, farPoints;
         MatVector temp = new MatVector(defects);
         for (int i = 0; i < temp.size(); ++i) {//TODO
-            startPoints.push_back(contoursMatArr[biggestContourIdx]);   
+            startPoints.push_back(contoursMatArr[biggestContourIdx]);
+
+            if (this.findPointsDistance(new Point(contoursMatArr[biggestContourIdx]), centerOfRect) < boundingRect.height() * BOUNDING_RECT_FINGER_SIZE_SCALING) {//TODO
+                  
+            }
         }
-        
-        
+
+        return null;//TODO
+    }
+
+    public static double findPointsDistance(Point a, Point b) {
+        return Math.sqrt(Math.pow(a.x() - b.x(), 2) + Math.pow(a.y() - b.y(), 2));
+
     }
 
 }
