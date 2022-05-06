@@ -77,7 +77,7 @@ public class FingerCount {
             startPoints.push_back(contoursMatArr[biggestContourIdx]);   
         }
         
-        
+      return null;  
     }
 
 }
