@@ -49,7 +49,7 @@ public class FingerCount {
         double biggestArea = 0;
 //        Mat[] contoursMatArr = contours.get();
         for (int i = 0; i < contours.size(); ++i) {
-            double area = opencv_imgproc.contourArea(contoursMat.get(i), true);
+            double area = opencv_imgproc.contourArea(contours.get(i), false);
             if (area > biggestArea) {
                 biggestArea = area;
                 biggestContourIdx = i;
@@ -60,9 +60,9 @@ public class FingerCount {
             return contoursMat;
         }
         
-        Mat hullPoints = null, hullIndxs = null;
-        opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullPoints, true, true);
-        opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullIndxs, true, false);
+        MatofPoint hullPoints = null, MatofInt hullIndxs = null;
+        opencv_imgproc.convexHull(contours.get(biggestContourIdx), hullPoints, true, true);
+        opencv_imgproc.convexHull(contours.get(biggestContourIdx), hullIndxs, true, false);
         
         Mat defects = null;
         if (3 < hullIndxs.rows()){//TODO
