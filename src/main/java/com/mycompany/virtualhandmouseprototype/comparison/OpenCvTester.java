@@ -9,8 +9,8 @@ import org.opencv.core.Mat;
  * @author 1100015542
  */
 public class OpenCvTester {
-    public static String zerosTest() {
-        Mat m = Mat.zeroes(new Size(0, 0, 8), 3);
-        System.out.println(m);
-    }
+//    public static String zerosTest() {
+//        Mat m = Mat.zeroes(new Size(0, 0, 8), 3);
+//        System.out.println(m);
+//    }
 }

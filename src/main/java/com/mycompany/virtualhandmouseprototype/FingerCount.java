@@ -32,12 +32,13 @@ public class FingerCount {
     private final Scalar purple = new Scalar(255, 0, 255, 0);
 
     public Mat findFingersCount(Mat input, Mat frame) {
-        Mat contoursMat = Mat.zeros(input.size(), opencv_core.CV_8UC3).asMat();
+        Mat contoursMat = Mat.zeros(input.rows(), input.cols(), opencv_core.CV_8UC3).asMat();
 
         if (input.empty() || input.channels() != 1) {
             return contoursMat;
         }
-        MatVector contours = null;
+        
+        List<MatofPoints> contours = null;
         Mat hierarchy = null;
         opencv_imgproc.findContours(input, contours, hierarchy, opencv_imgproc.CV_RETR_EXTERNAL, opencv_imgproc.CHAIN_APPROX_NONE);
 
@@ -46,9 +47,9 @@ public class FingerCount {
         }
         int biggestContourIdx = -1;
         double biggestArea = 0;
-        Mat[] contoursMatArr = contours.get();
+//        Mat[] contoursMatArr = contours.get();
         for (int i = 0; i < contours.size(); ++i) {
-            double area = opencv_imgproc.contourArea(contoursMatArr[i], true);
+            double area = opencv_imgproc.contourArea(contoursMat.get(i), true);
             if (area > biggestArea) {
                 biggestArea = area;
                 biggestContourIdx = i;
@@ -58,7 +59,7 @@ public class FingerCount {
         if (biggestContourIdx < 0) {
             return contoursMat;
         }
-
+        
         Mat hullPoints = null, hullIndxs = null;
         opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullPoints, true, true);
         opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullIndxs, true, false);
