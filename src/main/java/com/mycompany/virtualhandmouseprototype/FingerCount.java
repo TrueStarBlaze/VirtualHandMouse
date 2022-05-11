@@ -74,7 +74,7 @@ public class FingerCount {
         Mat startPoints = null, farPoints;
         MatVector temp = new MatVector(defects);
         for (int i = 0; i < temp.size(); ++i) {//TODO
-            startPoints.push_back(contoursMatArr[biggestContourIdx]);   
+//            startPoints.push_back(contoursMatArr[biggestContourIdx].val(0));   
         }
         
       return null;  
