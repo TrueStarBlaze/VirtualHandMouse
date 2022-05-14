@@ -5,24 +5,25 @@
 package com.mycompany.virtualhandmouseprototype;
 
 //import java.nio.ByteBuffer;
-import org.bytedeco.opencv.opencv_core.Mat;
-import org.bytedeco.opencv.global.opencv_core;
+//import org.bytedeco.opencv.opencv_core.Mat;
+//import org.bytedeco.opencv.global.opencv_core;
 //import org.bytedeco.javacpp.presets.javacpp;
-//import org.opencv.core.Mat;
-import org.bytedeco.opencv.opencv_core.Point;
-import org.bytedeco.opencv.global.opencv_imgproc;
-//import org.opencv.core.Point;
-//import org.opencv.core.Rect;
-import org.bytedeco.opencv.opencv_core.Rect;
-//import org.opencv.core.Scalar;
-import org.bytedeco.opencv.opencv_core.Scalar;
-//import org.opencv.imgproc.Imgproc;
+import org.opencv.core.Mat;
+//import org.bytedeco.opencv.opencv_core.Point;
+//import org.bytedeco.opencv.global.opencv_imgproc;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+//import org.bytedeco.opencv.opencv_core.Rect;
+import org.opencv.core.Scalar;
+//import org.bytedeco.opencv.opencv_core.Scalar;
+import org.opencv.imgproc.Imgproc;
 //TODO
-//import org.opencv.core.CvType;
+import org.opencv.core.CvType;
+import org.opencv.core.Core;
 //import org.bytedeco.opencv.opencv_core.CvScalar;
-//import org.opencv.core.Size;
-import org.bytedeco.opencv.opencv_core.Size;
-import org.bytedeco.javacpp.indexer.DoubleIndexer;
+import org.opencv.core.Size;
+//import org.bytedeco.opencv.opencv_core.Size;
+//import org.bytedeco.javacpp.indexer.DoubleIndexer;
 
 /**
  *
@@ -43,8 +44,8 @@ public class SkinDetector {
         int offsetLowThreshold = 80;
         int offsetHighThreshold = 30;
 //        Scalar hsvMeansSample1 = opencv_core.mean(sample1);
-        Scalar hsvMeansSample1 = opencv_core.mean(sample1);
-        Mat hsvMeansMat1 = new Mat(hsvMeansSample1);
+        Scalar hsvMeansSample1 = Core.mean(sample1);
+        
         DoubleIndexer dI1 = hsvMeansMat1.createIndexer();
 
 //        Scalar hsvMeansSample2 = opencv_core.mean(sample2);
@@ -56,13 +57,13 @@ public class SkinDetector {
         this.hLowThreshold = (int) (Math.min(dI1.get(0), dI1.get(0)) - offsetLowThreshold);
         this.hHighThreshold = (int) (Math.max(dI2.get(0), dI2.get(0)) + offsetHighThreshold);
         //s channel
-        this.hLowThreshold = (int) (Math.min(dI1.get(1), dI1.get(1)) - offsetLowThreshold);
-        this.hHighThreshold = (int) (Math.max(dI2.get(1), dI2.get(1)) + offsetHighThreshold);
+        this.sLowThreshold = (int) (Math.min(dI1.get(1), dI1.get(1)) - offsetLowThreshold);
+        this.sHighThreshold = (int) (Math.max(dI2.get(1), dI2.get(1)) + offsetHighThreshold);
 
         //v channel
         //redundant but secure to make future scalars consistent with hsv
-        this.hLowThreshold = (int) (Math.min(dI1.get(2), dI1.get(2)) - offsetLowThreshold);
-        this.hHighThreshold = (int) (Math.max(dI2.get(2), dI2.get(2)) + offsetHighThreshold);
+        this.vLowThreshold = (int) (Math.min(dI1.get(2), dI1.get(2)) - offsetLowThreshold);
+        this.vHighThreshold = (int) (Math.max(dI2.get(2), dI2.get(2)) + offsetHighThreshold);
     }
 
     private void performOpening(Mat binaryImage, int structuralElementShape, Point structuralElementSize) {

@@ -18,11 +18,15 @@ import org.bytedeco.javacv.FrameGrabber;
  */
 public class Tester {
 
+    static {
+        System.load("C:\\Users\\erick\\Documents\\NetBeansProjects\\LocalIndexerTest\\opencv\\build\\java\\x64\\opencv_java455.dll");
+    }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws AWTException, FrameGrabber.Exception, InterruptedException {
-        VideoAccessor va = new VideoAccessor(0);
+        VideoAccessor va  = new VideoAccessor(0);
         va.init();
     }
 
