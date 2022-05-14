@@ -45,37 +45,34 @@ public class SkinDetector {
         int offsetHighThreshold = 30;
 //        Scalar hsvMeansSample1 = opencv_core.mean(sample1);
         Scalar hsvMeansSample1 = Core.mean(sample1);
-        
-        DoubleIndexer dI1 = hsvMeansMat1.createIndexer();
+        double[] pixels1 = hsvMeansSample1.val;
 
 //        Scalar hsvMeansSample2 = opencv_core.mean(sample2);
-        Scalar hsvMeansSample2 = opencv_core.mean(sample2);
-        Mat hsvMeansMat2 = new Mat(hsvMeansSample2);
-        DoubleIndexer dI2 = hsvMeansMat2.createIndexer();
-
+        Scalar hsvMeansSample2 = Core.mean(sample2);
+        double[] pixels2 = hsvMeansSample2.val;
         //h channel
-        this.hLowThreshold = (int) (Math.min(dI1.get(0), dI1.get(0)) - offsetLowThreshold);
-        this.hHighThreshold = (int) (Math.max(dI2.get(0), dI2.get(0)) + offsetHighThreshold);
+        this.hLowThreshold = (int) (Math.min(pixels1[0], pixels2[0]) - offsetLowThreshold);
+        this.hHighThreshold = (int) (Math.max(pixels1[0], pixels2[0]) + offsetHighThreshold);
         //s channel
-        this.sLowThreshold = (int) (Math.min(dI1.get(1), dI1.get(1)) - offsetLowThreshold);
-        this.sHighThreshold = (int) (Math.max(dI2.get(1), dI2.get(1)) + offsetHighThreshold);
+        this.sLowThreshold = (int) (Math.min(pixels1[1], pixels2[1]) - offsetLowThreshold);
+        this.sHighThreshold = (int) (Math.max(pixels1[0], pixels2[0]) + offsetHighThreshold);
 
         //v channel
         //redundant but secure to make future scalars consistent with hsv
-        this.vLowThreshold = (int) (Math.min(dI1.get(2), dI1.get(2)) - offsetLowThreshold);
-        this.vHighThreshold = (int) (Math.max(dI2.get(2), dI2.get(2)) + offsetHighThreshold);
+        this.vLowThreshold = (int) (Math.min(pixels1[0], pixels2[0]) - offsetLowThreshold);
+        this.vHighThreshold = (int) (Math.max(pixels1[0], pixels2[0]) + offsetHighThreshold);
     }
 
     private void performOpening(Mat binaryImage, int structuralElementShape, Point structuralElementSize) {
-        Mat structuringElement = opencv_imgproc.getStructuringElement(structuralElementShape, new Size(structuralElementSize));
-        opencv_imgproc.morphologyEx(binaryImage, binaryImage, opencv_imgproc.MORPH_OPEN, structuringElement);
+        Mat structuringElement = Imgproc.getStructuringElement(structuralElementShape, new Size(structuralElementSize));
+        Imgproc.morphologyEx(binaryImage, binaryImage, Imgproc.MORPH_OPEN, structuringElement);
 
         //binary img is src and dst
     }
 
     public void drawSkinColorSampler(Mat input) {
-        int frameWidth = (int) input.size().width();
-        int frameHeight = (int) input.size().height();
+        int frameWidth = (int) input.size().width;
+        int frameHeight = (int) input.size().height;
 
         int rectSize = 20; //rectangle of roughly this size to cover face
 //        Scalar rectangleColour = new Scalar(255, 0, 255);
@@ -85,11 +82,11 @@ public class SkinDetector {
         this.skinColorSamplerRectangle2 = new Rect(frameWidth / 5, frameHeight / 3, rectSize, rectSize);
 
         //covering up the face face
-        opencv_imgproc.rectangle(input,
+        Imgproc.rectangle(input,
                 this.skinColorSamplerRectangle1,
                 rectangleColour);
 
-        opencv_imgproc.rectangle(input,
+        Imgproc.rectangle(input,
                 this.skinColorSamplerRectangle2,
                 rectangleColour);
 
@@ -98,7 +95,7 @@ public class SkinDetector {
     public void calibrate(Mat input) {
         //converting to HSV to increase resistance against shadows and influence
         Mat hsvInput = null;
-        opencv_imgproc.cvtColor(input, hsvInput, opencv_imgproc.COLOR_BGR2HSV);
+        Imgproc.cvtColor(input, hsvInput, Imgproc.COLOR_BGR2HSV);
         Mat sample1 = new Mat(hsvInput, skinColorSamplerRectangle1);
         Mat sample2 = new Mat(hsvInput, skinColorSamplerRectangle2);
         this.calculateThresholds(sample1, sample2);
@@ -109,17 +106,17 @@ public class SkinDetector {
     public Mat getSkinMask(Mat input) {
         Mat skinMask = null;
         if (!this.calibrated) {
-            skinMask = Mat.zeros(input.size(), opencv_core.CV_8UC1).asMat();
+            skinMask = Mat.zeros(input.size(), CvType.CV_8UC1);
 
             return skinMask;
         }
         Mat hsvInput = null;
-        opencv_imgproc.cvtColor(input, hsvInput, opencv_imgproc.COLOR_BGR2HSV);
-
-        opencv_core.inRange(
+        Imgproc.cvtColor(input, hsvInput, Imgproc.COLOR_BGR2HSV);
+        
+        Core.inRange(
                 hsvInput,
-                new Mat(new Scalar(this.hLowThreshold, this.sLowThreshold, this.vLowThreshold, 0)),
-                new Mat(new Scalar(this.hHighThreshold, this.sHighThreshold, this.vHighThreshold, 0)),
+                new Scalar(vLowThreshold, vLowThreshold, vLowThreshold),
+                new Scalar(this.hHighThreshold, this.sHighThreshold, this.vHighThreshold),
                 skinMask);
         return skinMask;
     }
