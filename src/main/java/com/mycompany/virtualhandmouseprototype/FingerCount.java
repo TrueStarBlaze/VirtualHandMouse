@@ -6,16 +6,28 @@
 package com.mycompany.virtualhandmouseprototype;
 
 //import java.util.ArrayList;
-import org.bytedeco.opencv.global.opencv_core;
-import org.bytedeco.opencv.opencv_core.Mat;
+//import org.bytedeco.opencv.global.opencv_core;
+import java.util.List;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+//import org.bytedeco.opencv.opencv_core.Mat;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfInt;
+import org.opencv.core.MatOfInt4;
+import org.opencv.core.MatOfPoint;
 //import org.bytedeco.opencv.opencv_core.Point;
-import org.bytedeco.opencv.opencv_core.Scalar;
-import org.bytedeco.opencv.global.opencv_imgproc;
+//import org.bytedeco.opencv.opencv_core.Scalar;
+import org.opencv.core.Scalar;
+//import org.bytedeco.opencv.global.opencv_imgproc;
+import org.opencv.imgproc.Imgproc;
 //import org.bytedeco.opencv.presets.opencv_imgproc
-import org.bytedeco.opencv.opencv_core.MatVector;
-import org.bytedeco.opencv.opencv_core.Point;
-import org.bytedeco.opencv.opencv_core.Rect;
+//import org.bytedeco.opencv.opencv_core.MatVector;
+//import org.bytedeco.opencv.opencv_core.Point;
+//import org.bytedeco.opencv.opencv_core.Rect;
+import org.opencv.core.Rect;
+import org.opencv.core.Point;
 //import org.bytedeco.opencv.opencv_core.MatVectorVector;
+
 
 /**
  *
@@ -35,23 +47,25 @@ public class FingerCount {
     private final double BOUNDING_RECT_FINGER_SIZE_SCALING = 0.3;
 
     public Mat findFingersCount(Mat input, Mat frame) {
-        Mat contoursMat = Mat.zeros(input.size(), opencv_core.CV_8UC3).asMat();
+        Mat contours_image = Mat.zeros(input.size(), CvType.CV_8UC3);
 
         if (input.empty() || input.channels() != 1) {
-            return contoursMat;
+            return contours_image;
         }
-        MatVector contours = null;
+        List<MatOfPoint> contours = null;
         Mat hierarchy = null;
-        opencv_imgproc.findContours(input, contours, hierarchy, opencv_imgproc.CV_RETR_EXTERNAL, opencv_imgproc.CHAIN_APPROX_NONE);
+        //CV_RETR_EXTERNAL = 0
+        Imgproc.findContours(input, contours, hierarchy, 0, Imgproc.CHAIN_APPROX_NONE);
 
         if (contours.size() <= 0) {
-            return contoursMat;
+            return contours_image;
         }
+        
         int biggestContourIdx = -1;
         double biggestArea = 0;
-        Mat[] contoursMatArr = contours.get();
+        
         for (int i = 0; i < contours.size(); ++i) {
-            double area = opencv_imgproc.contourArea(contoursMatArr[i], true);
+            double area = Imgproc.contourArea(contours.get(i), true);
             if (area > biggestArea) {
                 biggestArea = area;
                 biggestContourIdx = i;
@@ -59,21 +73,29 @@ public class FingerCount {
         }
 
         if (biggestContourIdx < 0) {
-            return contoursMat;
+            return contours_image;
         }
 
-        Mat hullPoints = null, hullIndxs = null;
-        opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullPoints, true, true);
-        opencv_imgproc.convexHull(contoursMatArr[biggestContourIdx], hullIndxs, true, false);
+        MatOfInt hullPoints = null;
+        MatOfInt hullIndxs = null;
+        /*TODO should hullpoints be MatOfPoint?
+        
+        
+        ???
+                
+                
+        */
+        Imgproc.convexHull(contours.get(biggestContourIdx), hullPoints, true);
+        Imgproc.convexHull(contours.get(biggestContourIdx), hullIndxs, false);
 
-        Mat defects = null;
+        MatOfInt4 defects = null;
         if (3 < hullIndxs.rows()) {//TODO
-            opencv_imgproc.convexityDefects(contoursMatArr[biggestContourIdx], hullIndxs, defects);
+            Imgproc.convexityDefects(contours.get(biggestContourIdx), hullIndxs, defects);
         } else {
-            return contoursMat;
+            return contours_image;
         }
 
-        Rect boundingRect = opencv_imgproc.boundingRect(hullPoints);
+        Rect boundingRect = Imgproc.boundingRect(hullPoints);
         Point centerOfRect = new Point(boundingRect.tl().x() + boundingRect.br().x() / 2, boundingRect.tl().y() + boundingRect.br().y() / 2);
 
         Mat startPoints = null, farPoints;
