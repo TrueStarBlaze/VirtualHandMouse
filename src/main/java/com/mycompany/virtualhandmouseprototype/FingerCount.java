@@ -8,6 +8,7 @@ package com.mycompany.localschoolvhm;
  *
  * @author 1100015542
  */
+import java.util.ArrayList;
 import java.util.List;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -25,29 +26,30 @@ import org.opencv.core.Point;
 
 public class FingerCount {
 
-    private final Scalar blue = new Scalar(255, 0, 0, 0);
-    private final Scalar green = new Scalar(0, 255, 0, 0);
-    private final Scalar red = new Scalar(0, 0, 255, 0);
-    private final Scalar black = new Scalar(0, 0, 0, 0);
-    private final Scalar white = new Scalar(255, 255, 255, 0);
-    private final Scalar yellow = new Scalar(0, 255, 255, 0);
-    private final Scalar purple = new Scalar(255, 0, 255, 0);
-
-    private final double BOUNDING_RECT_FINGER_SIZE_SCALING = 0.3;
+    private final double LIMIT_ANGLE_SUP = 60, LIMIT_ANGLE_INF = 5,
+            BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING = 0.05,
+            BOUNDING_RECT_FINGER_SIZE_SCALING = 0.3;
+    private final static Scalar blue = new Scalar(255, 0, 0, 0),
+            green = new Scalar(0, 255, 0, 0),
+            red = new Scalar(0, 0, 255, 0),
+            black = new Scalar(0, 0, 0, 0),
+            white = new Scalar(255, 255, 255, 0),
+            yellow = new Scalar(0, 255, 255, 0),
+            purple = new Scalar(255, 0, 255, 0);
 
     public Mat findFingersCount(Mat input, Mat frame) {
-        Mat contours_image = Mat.zeros(input.size(), CvType.CV_8UC3);
+        Mat contoursImage = Mat.zeros(input.size(), CvType.CV_8UC3);
 
         if (input.empty() || input.channels() != 1) {
-            return contours_image;
+            return contoursImage;
         }
-        List<MatOfPoint> contours = null;
-        Mat hierarchy = null;
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchy = new Mat();
         //CV_RETR_EXTERNAL = 0
         Imgproc.findContours(input, contours, hierarchy, 0, Imgproc.CHAIN_APPROX_NONE);
 
         if (contours.size() <= 0) {
-            return contours_image;
+            return contoursImage;
         }
 
         int biggestContourIdx = -1;
@@ -62,33 +64,50 @@ public class FingerCount {
         }
 
         if (biggestContourIdx < 0) {
-            return contours_image;
+            return contoursImage;
         }
-
+/*
+        TODO 
+        optimize for just one contour: the biggest one
+        */
         MatOfPoint biggestContour = contours.get(biggestContourIdx);
-        MatOfInt hullPoints = null;
-        MatOfInt hullIndxs = null;
-        /*TODO should hullpoints be MatOfPoint?
         
+        List<MatOfPoint> hullList = new ArrayList<>();
+        MatOfInt hullIndxs = new MatOfInt();
         
-        ???
+        Imgproc.convexHull(biggestContour, hullIndxs);
+        
+        Point[] biggestContourArray = biggestContour.toArray();
+        Point[] hullPoints = new Point[hullIndxs.rows()];
+        List<Integer> hullContourIdxList = hullIndxs.toList();
+        
+        for (int i = 0; i < hullContourIdxList.size(); ++i) {
+            hullPoints[i] = biggestContourArray[hullContourIdxList.get(i)];
+        }
+        hullList.add(new MatOfPoint(hullPoints));
+        
                 
-                
-         */
-        Imgproc.convexHull(biggestContour, hullPoints, true);
-        Imgproc.convexHull(biggestContour, hullIndxs, false);
+////////        MatOfInt hullPoints = null;
+////////        MatOfInt hullIndxs = null;
+////////        /*
+////////        TODO should hullpoints be MatOfPoint?
+////////         */
+////////        Imgproc.convexHull(biggestContour, hullPoints, true);
+////////        Imgproc.convexHull(biggestContour, hullIndxs, false);
 
-        MatOfInt4 defects = null;
+        MatOfInt4 defects = new MatOfInt4();
         /*
         check later whether this is the equivalent of the size from before
          */
         if (3 < hullIndxs.size().area()) {//TODO could be hullIndxs.toList().size();
             Imgproc.convexityDefects(biggestContour, hullIndxs, defects);
         } else {
-            return contours_image;
+            return contoursImage;
         }
-
-        Rect boundingRect = Imgproc.boundingRect(hullPoints);
+        
+        MatOfPoint hullPointsMat = new MatOfPoint();
+        hullPointsMat.fromArray(hullPoints);
+        Rect boundingRect = Imgproc.boundingRect(hullPointsMat);
         Point centerOfRect = new Point((boundingRect.tl().x + boundingRect.br().x) / 2, (boundingRect.tl().y + boundingRect.br().y) / 2);
 
         MatOfPoint startPoints = new MatOfPoint(), farPoints = new MatOfPoint();
@@ -109,16 +128,81 @@ public class FingerCount {
         MatOfPoint filteredSP = compactOnNeighbourhoodMedian(startPoints, boundingRect.height * BOUNDING_RECT_FINGER_SIZE_SCALING);
         MatOfPoint filteredFP = compactOnNeighbourhoodMedian(farPoints, boundingRect.height * BOUNDING_RECT_FINGER_SIZE_SCALING);
 
-        MatOfPoint filteredFingerPoints;
+        Point[] fSPArr = filteredSP.toArray();
+        Point[] fFPArr = filteredFP.toArray();
 
-        if (filteredFP.toList().size() > 1) {
-            MatOfPoint fingerPoints;
+        MatOfPoint filteredFingerPoints = null;
 
-            for (int i = 0; i < filteredSP.toList().size(); ++i) {
-                //MatOfPoint closestPoints 
+        int filteredFPSize = filteredFP.toArray().length;
+        int filteredSPSize = filteredSP.toArray().length;
+
+        if (filteredFPSize > 1) {
+            MatOfPoint fingerPoints = new MatOfPoint();
+
+            for (int i = 0; i < filteredSPSize; ++i) {
+                MatOfPoint closestPoints = FingerCount.findClosestOnX(filteredFP, fFPArr[i]);
+
+                if (FingerCount.isFinger(closestPoints.toArray()[0],
+                        fSPArr[i],
+                        closestPoints.toArray()[1],
+                        LIMIT_ANGLE_INF,
+                        LIMIT_ANGLE_SUP,
+                        centerOfRect,
+                        boundingRect.height * BOUNDING_RECT_FINGER_SIZE_SCALING)) 
+                    fingerPoints.push_back(new MatOfPoint(fSPArr[i]));
             }
+            int fingerPointsSize = fingerPoints.toArray().length;
+            if (fingerPointsSize > 0) {
+                /*
+                TODO donut know if opencv pops from the front or back of list maybe try both ways after implementation of gui
+                also maybe optimize
+                */
+                while (fingerPointsSize > 5){
+                        List<Point> fpl = fingerPoints.toList();
+                        fpl.remove(fpl.size() - 1);
+                        fingerPoints.fromList(fpl);
+                }
+                //filter based on proximity
+                
+                Point[] fingerPointsArr = fingerPoints.toArray();
+                for (int i = 0; i < fingerPointsArr.length; ++i) {
+                    if (FingerCount.findPointsDistanceOnX(fingerPointsArr[i], fingerPointsArr[i + 1]) > boundingRect.height *BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 1.5)
+                        filteredFingerPoints.push_back(new MatOfPoint(fingerPointsArr[i]));
+                }
+                /*
+                TODO wth is this if statement for seems to do it either way??? ROFL
+                */
+                if (fingerPointsArr.length > 2) {
+                    if (FingerCount.findPointsDistanceOnX(fingerPointsArr[0], fingerPointsArr[fingerPointsArr.length - 1]) > boundingRect.height *BOUNDING_RECT_NEIGHBOR_DISTANCE_SCALING * 1.5)
+                        filteredFingerPoints.push_back(new MatOfPoint(fingerPointsArr[fingerPointsArr.length - 1]));
+                }else {
+                    filteredFingerPoints.push_back(new MatOfPoint(fingerPointsArr[fingerPointsArr.length - 1]));
+                }
+                        
+            }
+            
         }
+        
+        Imgproc.drawContours(contoursImage, contours, biggestContourIdx, green, 2, 8, hierarchy);
+        /*
+        TODO how to proceed with hullPoints
+        */
+        List<MatOfPoint> listOfPoints = new ArrayList<>();
+	Imgproc.polylines(contoursImage, hullList, true, blue);
+	Imgproc.rectangle(contoursImage, boundingRect.tl(), boundingRect.br(), red, 2, 8, 0);
+	Imgproc.circle(contoursImage, centerOfRect, 5, purple, 2, 8);
+	FingerCount.drawVectorPoints(contoursImage, filteredSP, blue, true);
+	FingerCount.drawVectorPoints(contoursImage, filteredFP, red, true);
+	FingerCount.drawVectorPoints(contoursImage, filteredFingerPoints, yellow, false);
+	Imgproc.putText(contoursImage, (filteredFingerPoints.size()), centerOfRect, Imgproc.FONT_HERSHEY_PLAIN, 3, purple);
 
+	// and on the starting frame
+	Imgproc.drawContours(frame, contours, biggestContourIdx, green, 2, 8, hierarchy);
+	Imgproc.circle(frame, centerOfRect, 5, purple, 2, 8);
+	FingerCount.drawVectorPoints(frame, filteredFingerPoints, yellow, false);
+	Imgproc.putText(frame, (filteredFingerPoints.size()), centerOfRect, Imgproc.FONT_HERSHEY_PLAIN, 3, purple);
+        
+        return contoursImage;
     }
 
     private static double findPointsDistance(Point a, Point b) {
@@ -165,7 +249,95 @@ public class FingerCount {
         // cos C = (a^2 + b^2 - c^2)/ 2ab
         //also converted to degrees
         double radAng = Math.acos((ab * ab + bc * bc - ac * ac) / (2 * ab * bc));
-        double deg =  radAng * 180 / Math.PI;
+        double deg = radAng * 180 / Math.PI;
         return deg;
+    }
+
+    private static boolean isFinger(Point a, Point b, Point c, double limitAngleInf, double limitAngleSup,
+            Point palmCenter, double minDistanceFromPalm) {
+
+        double angle = FingerCount.findAngle(a, b, c);
+        if (angle > limitAngleSup || angle < limitAngleInf) {
+            return false;
+        }
+
+        double deltaY1 = b.y - a.y;
+        double deltaY2 = b.y - c.y;
+        if (deltaY1 > 0 && deltaY2 > 0) {
+            return false;
+        }
+
+        double deltaY3 = palmCenter.y - a.y;
+        double deltaY4 = palmCenter.y - c.y;
+        if (deltaY3 < 0 && deltaY4 < 0) {
+            return false;
+        }
+
+        double distanceFromPalm = FingerCount.findPointsDistance(b, palmCenter);
+        if (distanceFromPalm < minDistanceFromPalm) {
+            return false;
+        }
+
+        double distanceFromPalmFar1 = FingerCount.findPointsDistance(a, palmCenter);
+        double distanceFromPalmFar2 = FingerCount.findPointsDistance(a, palmCenter);
+        if (distanceFromPalmFar1 < minDistanceFromPalm / 4 || distanceFromPalmFar2 < minDistanceFromPalm / 4) {
+            return false;
+        }
+        return true;
+    }
+
+    private static MatOfPoint findClosestOnX(MatOfPoint points, Point pivot) {
+        MatOfPoint ret = new MatOfPoint();
+        /*
+        TODO
+        what MatOfPoint constructor takes an int 2 param???
+        originally vector<Point>
+         */
+        int pointsSize = points.toArray().length;
+        if (pointsSize == 0) {
+            return ret;
+        }
+
+        double distanceX1 = Double.MAX_VALUE;
+        double distance1 = Double.MAX_VALUE;
+        double distanceX2 = Double.MAX_VALUE;
+        double distance2 = Double.MAX_VALUE;
+        int indexFound = 0;
+        Point[] pointsArr = points.toArray();
+        for (int i = 0; i < pointsSize; ++i) {
+            double distanceX = findPointsDistanceOnX(pivot, pointsArr[i]);
+            double distance = findPointsDistance(pivot, pointsArr[i]);
+
+            if (distanceX < distanceX2 && distanceX != 0 && distance <= distance2 && distanceX != distanceX1) {
+                distanceX2 = distanceX;
+                distance2 = distance;
+                indexFound = i;
+            }
+        }
+
+        points.toList().add(1, pointsArr[indexFound]);
+        return ret;
+    }
+
+    private static double findPointsDistanceOnX(Point a, Point b) {
+        double ret = 0.0;
+
+        if (a.x > b.x) {
+            ret = a.x - b.x;
+        } else {
+            ret = b.x - a.x;
+        }
+
+        return ret;
+    }
+
+    private static void drawVectorPoints(Mat image, MatOfPoint points,
+            Scalar colour, boolean wNums) {
+        for (int i = 0; i < points.toArray().length; i++) {
+            Imgproc.circle(image, points.toArray()[i], 5, colour, 2, 8);
+            if (wNums) {
+                Imgproc.putText(image, ("" + i), points.toArray()[i], Imgproc.FONT_HERSHEY_PLAIN, 3, colour);
+            }
+        }
     }
 }
