@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.virtualhandmouseprototype;
+package backend_models;
 
-import org.bytedeco.opencv.opencv_core.CvMemStorage;
+//import org.bytedeco.opencv.opencv_core.CvMemStorage;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
@@ -23,11 +23,13 @@ import org.opencv.objdetect.Objdetect;
 
 
 public class FaceDetector {
-    private String faceClassifierFileName = "haarcascade_frontalface_alt.xml";
-    private CascadeClassifier faceCC;
-    public FaceDetector () {
-        this.faceCC.load(this.faceClassifierFileName);
-        CvMemStorage storage = CvMemStorage.create();
+    private static String faceClassifierFileName = "haarcascade_frontalface_alt.xml";
+    private static CascadeClassifier faceCC;
+    
+    public FaceDetector () throws Exception {
+        if (!faceCC.load(this.faceClassifierFileName)){
+            throw new Exception("Could not load famnce cascade (FaceDetector.java)");
+        }
     }
     
     
@@ -38,7 +40,7 @@ public class FaceDetector {
         Imgproc.cvtColor(input, frameGrey, Imgproc.COLOR_BGR2GRAY); //grey scaled
         Imgproc.equalizeHist(frameGrey, frameGrey); //improving distinction and contrast
                 
-            this.faceCC.detectMultiScale(frameGrey, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE/*CV_HAAR_SCALE_IMAGE*/ , new Size(120, 120));
+            faceCC.detectMultiScale(frameGrey, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE/*CV_HAAR_SCALE_IMAGE*/ , new Size(120, 120));
             //next step is to cover rect
             Rect[] rects = faces.toArray();
             for (int i = 0; i < faces.toArray().length; ++i) {
@@ -53,7 +55,7 @@ public class FaceDetector {
         Imgproc.cvtColor(input, inputGrey, Imgproc.COLOR_BGR2GRAY);
         Imgproc.equalizeHist(inputGrey, inputGrey);
         
-        this.faceCC.detectMultiScale(inputGrey, faces2, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE, new Size(120, 120));
+        faceCC.detectMultiScale(inputGrey, faces2, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE, new Size(120, 120));
         Rect[] facesRect = faces2.toArray();
         if (facesRect.length> 0)
 		return facesRect[0];
