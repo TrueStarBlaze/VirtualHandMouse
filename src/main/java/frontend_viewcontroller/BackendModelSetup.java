@@ -8,12 +8,21 @@ package frontend_viewcontroller;
  *
  * @author 1100015542
  */
+import backend_models.*;
 public class BackendModelSetup {
+
     //TODO
-    
+    BackgroundRemover backgroundRemover;
+    SkinDetector skinDetector;
+    FaceDetector faceDetector;
+    FingerCount fingerCount;
     //instantiate model
-    
+
     public BackendModelSetup() {
-       //construct
+        //construct
+        BackgroundRemover backgroundRemover = new BackgroundRemover();
+        SkinDetector skinDetector = new SkinDetector();
+        FaceDetector faceDetector = new FaceDetector();
+        FingerCount fingerCount = new FingerCount();
     }
 }
