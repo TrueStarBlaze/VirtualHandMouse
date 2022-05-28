@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.virtualhandmouseprototype;
+package backend_models;
 
 import org.opencv.core.Mat;
 //import org.bytedeco.opencv.opencv_core.Mat;
@@ -28,7 +28,7 @@ public class BackgroundRemover {
         this.background = null;
     }
 
-    private void calibrate(Mat input) {
+    public void calibrate(Mat input) {
         Imgproc.cvtColor(input, background, Imgproc.COLOR_BGR2GRAY);
         this.calibrated = true;
     }

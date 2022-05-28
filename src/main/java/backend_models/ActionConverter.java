@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.virtualhandmouseprototype;
+package backend_models;
 
 /**
  *
  * @author erick
  */
-public class TrendAnalyst {
-    public static boolean isFirmAction() {
+public class ActionConverter {
+    public static int actionToTake(int[] i) {
         
-        return false;
+        return 0;
     }
 }

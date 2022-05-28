@@ -1,5 +1,5 @@
 
-package com.mycompany.virtualhandmouseprototype;
+package backend_models;
 
 /**
  *

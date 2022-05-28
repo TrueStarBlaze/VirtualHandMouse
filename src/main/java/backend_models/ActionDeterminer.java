@@ -3,17 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.virtualhandmouseprototype;
-
-import org.bytedeco.opencv.opencv_core.IplImage;
+package backend_models;
 
 /**
  *
  * @author erick
  */
-public class HandLocationDeterminer {
-    public static int[] analyze(IplImage image) {
-        
-        return null;
+public class ActionDeterminer {
+    public static int determineAction(int[] i) {
+        return 0;
     }
 }

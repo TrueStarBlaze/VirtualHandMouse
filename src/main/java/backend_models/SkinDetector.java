@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.virtualhandmouseprototype;
+package backend_models;
 
 //import java.nio.ByteBuffer;
 //import org.bytedeco.opencv.opencv_core.Mat;
