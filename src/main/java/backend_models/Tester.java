@@ -5,28 +5,47 @@
  */
 package backend_models;
 
-import java.awt.AWTException;
-import org.opencv.core.Mat;
 
+import java.awt.AWTException;
+import java.io.File;
+import javax.swing.filechooser.FileSystemView;
+import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 import org.opencv.highgui.HighGui;
-import org.opencv.imgcodecs.Imgcodecs;
 
 /**
- *
+ * 
  * @author erick
  */
 public class Tester {
-
-//    static {
-//        System.load("C:\\Users\\erick\\Documents\\NetBeansProjects\\LocalIndexerTest\\opencv\\build\\java\\x64\\opencv_java455.dll");
-//    }
+    
+    static {
+//        HardDiskSearcher.findAndSetSystemType();
+//        
+//        File[] systemRoots = File.listRoots();
+//        FileSystemView fsv = FileSystemView.getFileSystemView();
+//        
+//        for (File root : systemRoots) {
+//            if (fsv.getSystemTypeDescription(root).equals("Local Disk")) {
+//                File[] filesFromRoot = root.listFiles();
+//                HardDiskSearcher.recursiveSearch(HardDiskSearcher.searchTerm, filesFromRoot);
+//            }
+//        }
+//
+//        if (!HardDiskSearcher.fileFound) {
+//            System.out.println("Libraries not properly loaded : " + HardDiskSearcher.path);
+//        }else {
+//            System.load(HardDiskSearcher.path);
+//        }
+    }
+    
     /**
      * @param args the command line arguments
+     * @throws java.awt.AWTException
+     * @throws java.lang.InterruptedException
      */
-    public static void main(String[] args) throws AWTException, InterruptedException, Exception {
-
+    public static void main(String[] args) throws Exception {
         int cam = 0;
         VideoCapture vc = new VideoCapture(cam);
         vc.set(Videoio.CAP_PROP_SETTINGS, 0);
@@ -39,8 +58,8 @@ public class Tester {
             System.exit(0);
         }
 
-        Mat frame = new Mat(), frameOut = new Mat(), handMask = new Mat(),
-                foreground = new Mat(), fingerCountDebug = new Mat();
+        Mat frame = new Mat(), frameOut, handMask,
+                foreground, fingerCountDebug;
 
         //init
         BackgroundRemover backgroundRemover = new BackgroundRemover();
